@@ -13,7 +13,15 @@ async function main() {
   await Promise.all([consumer.deployed()]);
 
   console.log("Pushing a request...");
-  await consumer.connect(deployer).request("0x01");
+  await consumer
+    .connect(deployer)
+    .request(
+      [1, 2, 3, 4, 5, 0, 0, 0, 0, 0],
+      [
+        500000000000000, 5000000000, 54545, 325000000000, 1100000000000, 0, 0,
+        0, 0, 0,
+      ]
+    );
   console.log("Done");
 }
 
