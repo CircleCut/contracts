@@ -74,7 +74,6 @@ contract PriceConversionContract is PhatRollupAnchor, Ownable {
 
     function getLatestResponseUSDC()public view returns(uint256)
     {
-        
-            return latestResponse[msg.sender].usdcAmount;
+       return latestResponse[msg.sender].usdcAmount;
     }
 }
