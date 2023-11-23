@@ -24,7 +24,23 @@ async function main() {
   console.log(`\n${finalMessage}\n`);
 
   console.log("Sending a request...");
-  await consumer.connect(deployer).request("0x01");
+  await consumer
+    .connect(deployer)
+    .request(
+      [1, 1785, 3, 0, 0, 0, 0, 0, 0, 0],
+      [
+        100000000000000n,
+        20000000000000000n,
+        3000000000000n,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+      ]
+    );
   console.log("Done");
 }
 
