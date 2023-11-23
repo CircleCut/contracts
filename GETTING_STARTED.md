@@ -1,7 +1,9 @@
 # Connect Phala's Oracle to EVM Consumer Contract
+
 ![](./assets/Phat-Contract-Logo.png)
 
 ### Table of Contents
+
 - [Overview](#overview)
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
@@ -21,14 +23,16 @@
   - [Deploy Phat Contract to Phala Mainnet](#deploy-phat-contract-to-phala-mainnet)
     - [Interact with Consumer Contract on Polygon Mainnet](#interact-with-consumer-contract-on-polygon-mainnet)
     - [Update Phat Contract on Phala Mainnet](#update-phat-contract-on-phala-mainnet)
-      
 - [Closing](#closing)
 
 ## Overview
+
 This project represents a basic EVM Consumer Contract that is compatible with a deployed Oracle written in TypeScript on Phala Network.
+
 > **Note**: For simplicity, we will utilize Polygon Mumbai and Polygon Mainnet for the following examples.
 
 ## Prerequisites
+
 - Active Phala Profile with version `>= 1.0.1` via [Phat Contract 2.0 UI](https://bricks.phala.network)
 - [Hardhat](https://hardhat.org)
 - For EVM Mainnet deployments:
@@ -40,20 +44,24 @@ This project represents a basic EVM Consumer Contract that is compatible with a 
 - Polkadot Account for Phala PoC5 Testnet and Mainnet deployment
 
 ### Environment Variables:
+
 Check out the environment variables here in [.env.local](./.env.local) file.
 
 ## Getting Started
+
 > :rotating_light: **Note** :rotating_light:: If you cloned this repo or created a template, skip to [Create a Phala Profile](#create-a-phala-profile)
-> 
-First you will need to install the `@phala/fn` CLI tool using your node package manager (`npm`) or use node package execute (`npx`). In this tutorial we use `npx`.
+>
+> First you will need to install the `@phala/fn` CLI tool using your node package manager (`npm`) or use node package execute (`npx`). In this tutorial we use `npx`.
 
 Now create your first template with the CLI tool command:
+
 ```bash
 npx @phala/fn@latest init userJourney
 # ? Please select one of the templates for your "userJourney" project: (Use arrow keys)
 # ❯ phat-contract-starter-kit. The Phat Contract Starter Kit
 #   lensapi-oracle-consumer-contract. Polygon Consumer Contract for LensAPI Oracle
 ```
+
 Choose `phat-contract-starter-kit` template and press enter to see something similar to the example below:
 
 ```bash
@@ -93,7 +101,9 @@ ls
 ```
 
 ## Create a Phala Profile
+
 This step requires you to have a Polkadot account. You can get an account from one of the following:
+
 - [Polkadot.js Wallet Extension](https://polkadot.js.org/extension/)
 - [Talisman Wallet](https://www.talisman.xyz/)
 - [SubWallet](https://www.subwallet.app/) (**Support for iOS/Android**)
@@ -103,6 +113,7 @@ Here is what your Phala Profile account overview should look like:
 ![](./assets/BricksProfileCheck.png)
 
 #### Option 1: Export Polkadot account as json file
+
 Go to your browser and click on the polkadot.js extension. Select your account and click "Export Account".
 ![](./assets/ExportAccount.png)
 Next, you will be prompted for your password before saving the file to your project directory. **Note** this is what will be set to [`POLKADOT_WALLET_ACCOUNT_PASSWORD`](./.env.local).
@@ -111,7 +122,8 @@ Make sure to save the file as `polkadot-account.json` in the root of your projec
 ![](./assets/SaveAccount.png)
 
 #### Option 2: Set mnemonic phrase to [`POLKADOT_WALLET_SURI`](./.env.local)
-After creating your Phala Profile, set your `.env` variable [`POLKADOT_WALLET_SURI`](./.env.local) to the mnemonic phrase from generating the new Polkadot Account. 
+
+After creating your Phala Profile, set your `.env` variable [`POLKADOT_WALLET_SURI`](./.env.local) to the mnemonic phrase from generating the new Polkadot Account.
 
 Here is a screenshot of how to set `POLKADOT_WALLET_SURI`:
 ![](./assets/PolkadotAccountSuri.png)
@@ -123,9 +135,11 @@ Here is a screenshot of how to set `POLKADOT_WALLET_SURI`:
 With a template created and a basic default Phat Contract example ready to test, let’s step through the process of preparing your repo to execute the test locally.
 
 First step is to install the package dependencies with the following command:
+
 ```bash
 yarn install
 ```
+
 Everything should go smoothly and produce similar output below:
 
 ```bash
@@ -140,9 +154,10 @@ yarn install
 
 Now that the package dependencies are installed, lets build the default Phat Contract which is located in [`./src/index.ts`](./src/index.ts).
 
-For those want to understand what the contents of `./src/index.ts` mean, go to the `PHAT_CONTRACT_INFO.md` file to read more. If you are already familiar with the concepts then you can proceed to with the deployment process. 
+For those want to understand what the contents of `./src/index.ts` mean, go to the `PHAT_CONTRACT_INFO.md` file to read more. If you are already familiar with the concepts then you can proceed to with the deployment process.
 
 Build the default Phat Contract with this command:
+
 ```bash
 yarn build-function
 ```
@@ -159,10 +174,13 @@ yarn build-function
 ```
 
 With our default Phat Contract built, we can run some initial tests. First test will be simple.
+
 ```bash
 yarn run-function
 ```
+
 It was expected for it to fail like this:
+
 ```bash
 yarn run-function
 # handle req: undefined
@@ -174,10 +192,11 @@ yarn run-function
 Notice that the test fails and reports that a `Malformed request received` was emitted and the request was `undefined`. This is expected as you will need to define the parameters by adding a `-a abi.encode(requestId, profileId) https://api-mumbai.lens.dev` to your command.
 
 To simulate the expected result locally, run the Phala Oracle function now with this command:
+
 ```bash
 yarn run-function -a 0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000 https://api-mumbai.lens.dev
 ```
->
+
 > **What are the ingredients for the `yarn run-function` command?**
 >
 > Our Phat Contract script, now fully constructed, is ready for a trial run. This simulation mirrors the live script's operation when deployed on the Phala Network.
@@ -185,17 +204,22 @@ yarn run-function -a 0x000000000000000000000000000000000000000000000000000000000
 > The command's first parameter is a HexString, representing a tuple of types `[uintCoder, bytesCoder]`. This serves as the entry function. The second parameter is a `string`, embodying the configurable secrets fed into the main function.
 >
 > The `Coders.decode` function deciphers these parameters, yielding the decoded `requestId` and `encodedReqStr`. These decoded elements then become the raw material for the rest of the custom logic within the script.
-> ```typescript 
+>
+> ```typescript
 > export default function main(request: HexString, secrets: string): HexString {
 >   console.log(`handle req: ${request}`);
 >   let requestId, encodedReqStr;
 >   try {
->     [requestId, encodedReqStr] = Coders.decode([uintCoder, bytesCoder], request);
+>     [requestId, encodedReqStr] = Coders.decode(
+>       [uintCoder, bytesCoder],
+>       request
+>     );
 >   } catch (error) {
 >     console.info("Malformed request received");
 >   }
-> // ...
-> } 
+>   // ...
+> }
+> ```
 
 <details>
   <summary><u>How the query looks under the hood</u></summary>
@@ -207,13 +231,13 @@ yarn run-function -a 0x000000000000000000000000000000000000000000000000000000000
   query Profile {
     profile(request: { profileId: "0x01" }) {
       stats {
-          totalFollowers
-          totalFollowing
-          totalPosts
-          totalComments
-          totalMirrors
-          totalPublications
-          totalCollects
+        totalFollowers
+        totalFollowing
+        totalPosts
+        totalComments
+        totalMirrors
+        totalPublications
+        totalCollects
       }
     }
   }
@@ -236,9 +260,10 @@ yarn run-function -a 0x000000000000000000000000000000000000000000000000000000000
     }
   }
   ```
-</details>
+  </details>
 
 You will see:
+
 ```bash
 yarn run-function -a 0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000040000000
 00000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000 https://api-mumbai.lens.dev
@@ -264,21 +289,21 @@ Lets’s start with the first test case.
 
 > Note: You will need to ensure you configure your local vars `POLYGON_RPC_URL` and `MUMBAI_RPC_URL` `.env` file. You can do this with `cp .env.local .env` then edit the `.env` with your information.
 
-
 <details>
   <summary>Expected error if <code>.env</code> not configured.</summary>
 
     yarn hardhat test
     # Error HH8: There's one or more errors in your config file:
-    
+
     #  * Invalid value undefined for HardhatConfig.networks.polygon.url - Expected a value of type string.
     #  * Invalid value undefined for HardhatConfig.networks.mumbai.url - Expected a value of type string.
-      
+
     # To learn more about Hardhat's configuration, please go to https://hardhat.org/config/
-    
+
     # For more info go to https://hardhat.org/HH8 or run Hardhat with --show-stack-traces
     # error Command failed with exit code 1.
     # info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.
+
 </details>
 
 ```bash
@@ -286,11 +311,12 @@ yarn hardhat test
 ```
 
 You will now see that all test cases have passed.
+
 ```bash
 yarn hardhat test
 # Compiled 14 Solidity files successfully
 #
-#  OracleConsumerContract.sol
+#  PriceConversionContract.sol
 #    ✔ Push and receive message (1664ms)
 #
 #  1 passing (2s)
@@ -298,8 +324,7 @@ yarn hardhat test
 # ✨  Done in 3.29s.
 ```
 
-This is how the e2e mocha test will look like. You can customize this file at [`OracleConsumerContract.ts`](./test/OracleConsumerContract.ts).
-
+This is how the e2e mocha test will look like. You can customize this file at [`PriceConversionContract.ts`](./test/PriceConversionContract.ts).
 
 **Run local hardhat node and watch the requests that are pushed and see how the Phat Contract transforms the data**
 
@@ -312,19 +337,21 @@ yarn hardhat node
 <details>
   <summary>Example output</summary>
 
-	yarn hardhat node
-	# Started HTTP and WebSocket JSON-RPC server at http://127.0.0.1:8545/
+    yarn hardhat node
+    # Started HTTP and WebSocket JSON-RPC server at http://127.0.0.1:8545/
 
-	# Accounts
-	# ========
+    # Accounts
+    # ========
 
-	# WARNING: These accounts, and their private keys, are publicly known.
-	# Any funds sent to them on Mainnet or any other live network WILL BE LOST.
+    # WARNING: These accounts, and their private keys, are publicly known.
+    # Any funds sent to them on Mainnet or any other live network WILL BE LOST.
+
 </details>
 
-With our hardhat node running locally, we can now deploy the `OracleConsumerContract.sol` contract to the local hardhat network.
+With our hardhat node running locally, we can now deploy the `PriceConversionContract.sol` contract to the local hardhat network.
+
 ```bash
-yarn localhost-deploy 
+yarn localhost-deploy
 ```
 
 ```bash
@@ -337,13 +364,13 @@ yarn localhost-deploy
 Make sure to copy the deployed contract address when you deploy your own contract locally. Note you contract address will be different than `0x0165878A594ca255338adfa4d48449f69242Eb8F`. We will now start watching the hardhat node deployed contract for any new requests.
 
 ```bash
-yarn localhost-watch 0x0165878A594ca255338adfa4d48449f69242Eb8F artifacts/contracts/OracleConsumerContract.sol/OracleConsumerContract.json dist/index.js -a https://api-mumbai.lens.dev/
+yarn localhost-watch 0x0165878A594ca255338adfa4d48449f69242Eb8F artifacts/contracts/PriceConversionContract.sol/PriceConversionContract.json dist/index.js -a https://api-mumbai.lens.dev/
 ```
 
 ```bash
-yarn localhost-watch 0x0165878A594ca255338adfa4d48449f69242Eb8F artifacts/contracts/OracleConsumerContract.sol/OracleConsumerContract.json dist/index.js -a https://api-mumbai.lens.dev/
-# $ phat-fn watch 0x0165878A594ca255338adfa4d48449f69242Eb8F artifacts/contracts/OracleConsumerContract.sol/OracleConsumerContract.sol.json dist/index.js -a https://api-mumbai.lens.dev/
-# Listening for OracleConsumerContract.sol MessageQueued events...
+yarn localhost-watch 0x0165878A594ca255338adfa4d48449f69242Eb8F artifacts/contracts/PriceConversionContract.sol/PriceConversionContract.json dist/index.js -a https://api-mumbai.lens.dev/
+# $ phat-fn watch 0x0165878A594ca255338adfa4d48449f69242Eb8F artifacts/contracts/PriceConversionContract.sol/PriceConversionContract.sol.json dist/index.js -a https://api-mumbai.lens.dev/
+# Listening for PriceConversionContract.sol MessageQueued events...
 ```
 
 Let’s now make a new request and see what happens with the listener’s output. In separate tab, you will push a request with the following.
@@ -366,7 +393,7 @@ LOCALHOST_CONSUMER_CONTRACT_ADDRESS=0x0165878A594ca255338adfa4d48449f69242Eb8F y
 If we look back at the listener tab, we will see output has been appended.
 
 ```typescript
-Listening for OracleConsumerContract MessageQueued events...
+Listening for PriceConversionContract MessageQueued events...
 Received event [MessageQueued]: {
   tail: 0n,
   data: '0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000043078303100000000000000000000000000000000000000000000000000000000'
@@ -378,8 +405,11 @@ JS Execution output: 0x000000000000000000000000000000000000000000000000000000000
 ```
 
 ## Deployment
+
 Now that you have the prerequisites to deploy a Polygon Consumer Contract on Polygon, lets begin with some initials tasks.
+
 ### Install Dependencies & Compile Contracts
+
 ```shell
 # install dependencies
 $ yarn
@@ -387,12 +417,16 @@ $ yarn
 # compile contracts
 $ yarn compile
 ```
+
 ### Deploy to Polygon Mumbai Testnet
+
 With the contracts successfully compiled, now we can begin deploying first to Polygon Mumbai Testnet. If you have not gotten `MATIC` for Mumbai Testnet then get `MATIC` from a [faucet](https://mumbaifaucet.com/).
 Ensure to save the address after deploying the Consumer Contract because this address will be use in the "[Configure Client](https://docs.phala.network/developers/bricks-and-blueprints/featured-blueprints/lensapi-oracle#step-4-configure-the-client-address)" section of Phat Bricks UI. The deployed address will also be set to the environment variable [`MUMBAI_CONSUMER_CONTRACT_ADDRESS`](./.env.local).
+
 ```bash
 yarn test-deploy
 ```
+
 ```shell
 # deploy contracts to testnet mumbai
 yarn test-deploy
@@ -408,12 +442,17 @@ yarn test-deploy
 # Done
 # ✨  Done in 8.20s.
 ```
+
 #### (Optional) Verify Contract on Polygon Mumbai Testnet
+
 Ensure to update the [`mumbai.arguments.ts`](./mumbai.arguments.ts) file with the constructor arguments used to instantiate the Consumer Contract. If you add additional parameters to the constructor function then make sure to update the `mumbai.arguments.ts` file.
+
 > **Note**: Your contract address will be different than `0x090E8fDC571d65459569BC87992C1026121DB955` when verifying your contract. Make sure to get your actual contract address from the console log output after executing `yarn test-deploy`.
+
 ```shell
 yarn test-verify <MUMBAI_CONSUMER_CONTRACT_ADDRESS>
 ```
+
 ```shell
 yarn test-verify 0x090E8fDC571d65459569BC87992C1026121DB955
 # yarn run v1.22.18
@@ -421,27 +460,32 @@ yarn test-verify 0x090E8fDC571d65459569BC87992C1026121DB955
 # Nothing to compile
 # No need to generate any newer typings.
 # Successfully submitted source code for contract
-# contracts/OracleConsumerContract.sol:OracleConsumerContract.sol at 0x090E8fDC571d65459569BC87992C1026121DB955
+# contracts/PriceConversionContract.sol:PriceConversionContract.sol at 0x090E8fDC571d65459569BC87992C1026121DB955
 # for verification on the block explorer. Waiting for verification result...
 #
-# Successfully verified contract OracleConsumerContract.sol on Etherscan.
+# Successfully verified contract PriceConversionContract.sol on Etherscan.
 # https://mumbai.polygonscan.com/address/0x090E8fDC571d65459569BC87992C1026121DB955#code
 # ✨  Done in 5.91s.
 ```
 
 ### Deploy Phat Contract to PoC5 Testnet
+
 For customizing your Phat Contract, checkout Phat Contract custom configurations in [JS_API_DOC.md](./src/JS_API_DOC.md) to learn more before deploying to PoC5 testnet.
 
 Now that are Phat Contract has built successfully, let's deploy to Phala PoC5 Testnet with the following command:
+
 ```shell
-# If you did not export your Polkadot account in a 
+# If you did not export your Polkadot account in a
 # polkadot-account.json file in the root of project
 yarn test-deploy-function
 # If polkadot-account.json is in the root of project
 yarn test-deploy-function -a ./polkadot-account.json
 ```
+
 Here is the expected output:
+
 > Note: your contract IDs will vary and not be the same as the IDs below.
+
 ```shell
 yarn test-deploy-function -a ./polkadot-account.json
 # ? Please enter your client RPC URL https://polygon-mumbai.g.alchemy.com/v2/JLjOfWJycWFOA0kK_SJ4jLGjtXkMN1wc
@@ -469,12 +513,15 @@ Go to the [PoC5 Testnet Phat Contract UI](https://bricks-poc5.phala.network) Das
 ![](./assets/Function-added.png)
 
 #### Interact with Consumer Contract on Polygon Mumbai
+
 Test Consumer Contract on Mumbai with a few tests to check for malformed requests failures, successful requests, and set the attestor.
 
 **Please make sure your have set your attestor address in .env file `MUMBAI_PHALA_ORACLE_ATTESTOR=`**
+
 ```shell
 yarn test-set-attestor
 ```
+
 ```shell
 yarn test-set-attestor
 # yarn run v1.22.18
@@ -493,6 +540,7 @@ Test pushing a malform request.
 ```shell
 yarn test-push-malformed-request
 ```
+
 ```shell
 yarn test-push-malformed-request
 # yarn run v1.22.18
@@ -507,6 +555,7 @@ Test pushing a valid request.
 ```shell
 yarn test-push-request
 ```
+
 ```shell
 yarn test-push-request
 # Pushing a request...
@@ -515,15 +564,18 @@ yarn test-push-request
 ```
 
 ### Update Phat Contract on Phala PoC5 Testnet
+
 Sometimes you may have had a bug in your script or you want to test things out on the fly without deploying a whole new Phat Contract. We now allow you to update your Phat Contract easily in the commandline.
 Now let's update the Phat Contract with the following command:
+
 ```shell
-# If you did not export your Polkadot account in a 
+# If you did not export your Polkadot account in a
 # polkadot-account.json file in the root of project
 yarn test-update-function
 # If polkadot-account.json is in the root of project
 yarn test-update-function -a ./polkadot-account.json
 ```
+
 ```shell
 yarn test-update-function -a ./polkadot-account.json
 # ? Please Enter hahaha account password [hidden]
@@ -541,11 +593,15 @@ yarn test-update-function -a ./polkadot-account.json
 # The Phat Function for workflow 1 has been updated.
 # ✨  Done in 10.82s.
 ```
+
 Congrats! You've now successfully updated your Phat Contract!
 
 ### Deploy to Polygon Mainnet
+
 Ensure to save the address after deploying the Consumer Contract because this address will be used in the "[Configure Client](https://docs.phala.network/developers/bricks-and-blueprints/featured-blueprints/lensapi-oracle#step-4-configure-the-client-address)" section of Phat Bricks UI. The deployed address will also be set to the environment variable [`POLYGON_CONSUMER_CONTRACT_ADDRESS`](./.env.local).
+
 > **Note**: Your contract address will be different than `0xbb0d733BDBe151dae3cEf8D7D63cBF74cCbf04C4` when verifying your contract. Make sure to get your actual contract address from the console log output after executing `yarn main-deploy`.
+
 ```shell
 yarn main-deploy
 # Deploying...
@@ -560,33 +616,42 @@ yarn main-deploy
 # Done
 # ✨  Done in 8.20s.
 ```
+
 #### (Optional) Verify Contract on Polygon Mainnet
+
 Ensure to update the [`polygon.arguments.ts`](./polygon.arguments.ts) file with the constructor arguments used to instantiate the Consumer Contract. If you add additional parameters to the constructor function then make sure to update the `polygon.arguments.ts` file.
+
 ```shell
 yarn main-verify 0xbb0d733BDBe151dae3cEf8D7D63cBF74cCbf04C4
 # Nothing to compile
 # No need to generate any newer typings.
 # Successfully submitted source code for contract
-# contracts/OracleConsumerContract.sol.sol:OracleConsumerContract.sol.sol.sol at 0xbb0d733BDBe151dae3cEf8D7D63cBF74cCbf04C4
+# contracts/PriceConversionContract.sol.sol:PriceConversionContract.sol.sol.sol at 0xbb0d733BDBe151dae3cEf8D7D63cBF74cCbf04C4
 # for verification on the block explorer. Waiting for verification result...
 #
-# Successfully verified contract OracleConsumerContract.sol on Etherscan.
+# Successfully verified contract PriceConversionContract.sol on Etherscan.
 # https://polygonscan.com/address/0xbb0d733BDBe151dae3cEf8D7D63cBF74cCbf04C4#code
 # Done in 8.88s.
 ```
+
 ### Deploy Phat Contract to Phala Mainnet
+
 For customizing your Phat Contract, Phat Contract custom configurations can be found here in [JS_API_DOC.md](./src/JS_API_DOC.md) to learn more before deploying to Phala Mainnet.
 
 Now that are Phat Contract has built successfully, let's deploy to Phala Mainnet with the following command:
+
 ```shell
-# If you did not export your Polkadot account in a 
+# If you did not export your Polkadot account in a
 # polkadot-account.json file in the root of project
 yarn main-deploy-function
 # If polkadot-account.json is in the root of project
 yarn main-deploy-function -a ./polkadot-account.json
 ```
+
 Here is the expected output:
+
 > Note: your contract IDs will vary and not be the same as the IDs below.
+
 ```shell
 yarn main-deploy-function -a ./polkadot-account.json
 # ? Please enter your client RPC URL https://polygon.g.alchemy.com/v2/JLjOfWJycWFOA0kK_SJ4jLGjtXkMN1wc
@@ -611,7 +676,9 @@ yarn main-deploy-function -a ./polkadot-account.json
 ```
 
 #### Interact with Consumer Contract on Polygon Mainnet
+
 Execute Scripts to Consumer Contract on Polygon Mainnet. The Consumer Contract on Polygon Mainnet with a few actions to mimic a malformed request, successful requests, and set the attestor.
+
 ```shell
 yarn main-set-attestor
 # Setting attestor...
@@ -632,15 +699,18 @@ yarn main-push-request
 ```
 
 ### Update Phat Contract on Phala Mainnet
+
 Sometimes you may have had a bug in your script or you want to test things out on the fly without deploying a whole new Phat Contract. We now allow you to update your Phat Contract easily in the commandline.
 Now let's update the Phat Contract with the following command:
+
 ```shell
-# If you did not export your Polkadot account in a 
+# If you did not export your Polkadot account in a
 # polkadot-account.json file in the root of project
 yarn main-update-function
 # If polkadot-account.json is in the root of project
 yarn main-update-function -a ./polkadot-account.json
 ```
+
 ```shell
 yarn main-update-function -a ./polkadot-account.json
 # ? Please Enter hahaha account password [hidden]
@@ -660,5 +730,6 @@ yarn main-update-function -a ./polkadot-account.json
 ```
 
 ## Closing
+
 Once you have stored, the deployed address of the Consumer Contract and set the value in the "Configure Client" section of the deployed Phala Oracle, you will now have a basic boilerplate example of how to connect your Polygon dApp to a Phala Oracle Template. Execute a new requests and check if your configuration is correct like below:
 ![](./assets/polygonscan-ex.png)

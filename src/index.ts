@@ -11,11 +11,11 @@ type HexString = `0x${string}`;
 const uintCoder = new Coders.NumberCoder(32, false, "uint256");
 const uintArrayCoder = new Coders.ArrayCoder(uintCoder, 10, "uint256");
 
-function encodeReply(reply: [number, number, number]): HexString {
+function encodeReply(reply: [number, number, bigint]): HexString {
   return Coders.encode([uintCoder, uintCoder, uintCoder], reply) as HexString;
 }
 
-// Defined in OracleConsumerContract.sol
+// Defined in PriceConversionContract.sol
 const TYPE_RESPONSE = 0;
 const TYPE_ERROR = 2;
 
@@ -27,39 +27,62 @@ enum Error {
   IncorrectIdsAndAmounts = "IncorrectIdsAndAmounts",
 }
 
-function errorToCode(error: Error): number {
+function errorToCode(error: Error): bigint {
   switch (error) {
     case Error.BadRequestString:
-      return 1;
+      return 1n;
     case Error.FailedToFetchData:
-      return 2;
+      return 2n;
     case Error.FailedToDecode:
-      return 3;
+      return 3n;
     case Error.MalformedRequest:
-      return 4;
+      return 4n;
     case Error.IncorrectIdsAndAmounts:
-      return 5;
+      return 5n;
     default:
-      return 0;
+      return 0n;
   }
 }
 
 function fetchPriceConversion(
-  currencyIds: number[],
-  currencyAmounts: number[],
+  currencyIds: any[],
+  currencyAmounts: any[],
   parsedSecrets: any
-): number {
+): bigint {
   let headers = {
     "Content-Type": "application/json",
     "User-Agent": "phat-contract",
     "X-CMC_PRO_API_KEY": parsedSecrets.superSecret,
   };
-  const filteredIds = currencyIds.filter((id) => id > 0);
-  const filteredAmounts = currencyAmounts.filter((amount) => amount > 0);
-  if (filteredIds.length !== filteredAmounts.length) {
-    throw Error.IncorrectIdsAndAmounts;
+  console.log("headers:", headers);
+  const filteredIds = [];
+  let index = 0;
+  while (index < currencyIds.length) {
+    if (currencyIds[index] > 0n) filteredIds.push(currencyIds[index]);
+    else break;
+    index++;
   }
+  console.log("filtering amounts");
+  const filteredAmounts = currencyAmounts.slice(0, index).map((amount) => {
+    let stringAmount = amount.toString();
+    let amountLength = stringAmount.length;
+    console.log("amountLength:", amountLength);
+    if (amountLength > 18)
+      return (
+        stringAmount.slice(0, amountLength - 18) +
+        "." +
+        stringAmount.slice(amountLength - 18, amountLength)
+      );
+    else {
+      return "0." + stringAmount.padStart(18, "0");
+    }
+  });
+  console.log("filteredIds:", filteredIds);
+  console.log("filteredAmounts:", filteredAmounts);
+
+  console.log("filteredIds.length:", filteredIds.length);
   const idString = filteredIds.join(",");
+  console.log("idString:", idString);
   let response = pink.batchHttpRequest(
     [
       {
@@ -87,10 +110,23 @@ function fetchPriceConversion(
 
   let prices = respData.data;
   let usdAmount = 0;
-  currencyIds.forEach((id: number, index: number) => {
-    usdAmount += prices[id.toString()].quote.USD.price * currencyAmounts[index];
+  filteredIds.forEach((id: number, index: number) => {
+    console.log(
+      "price for id:",
+      id,
+      " =>",
+      prices[id.toString()].quote.USD.price
+    );
+    usdAmount +=
+      prices[id.toString()].quote.USD.price * Number(filteredAmounts[index]);
   });
-  return usdAmount;
+
+  const usdAmountArray = usdAmount.toString().split(".");
+  const modifiedUsdAmount = BigInt(
+    usdAmountArray[0] + usdAmountArray[1].padEnd(18, "0")
+  );
+  console.log("usdAmount:", modifiedUsdAmount);
+  return modifiedUsdAmount;
 }
 
 export default function main(request: HexString, secrets: string): HexString {
@@ -98,7 +134,7 @@ export default function main(request: HexString, secrets: string): HexString {
   let parsedSecrets = JSON.parse(secrets);
   // Uncomment to debug the `secrets` passed in from the Phat Contract UI configuration.
   // console.log(`secrets: ${secrets}`);
-  let requestId: number, currencyIds: number[], currencyAmounts: number[];
+  let requestId, currencyIds, currencyAmounts;
   try {
     [requestId, currencyIds, currencyAmounts] = Coders.decode(
       [uintCoder, uintArrayCoder, uintArrayCoder],
@@ -110,12 +146,17 @@ export default function main(request: HexString, secrets: string): HexString {
   }
 
   try {
+    console.log("Going into fetchPriceConversion");
+    console.log("currencyIds:", currencyIds);
+    console.log("currencyAmounts:", currencyAmounts);
+    console.log(typeof currencyAmounts[0]);
+    console.log(currencyAmounts[0] / 1000000000000000000n);
     const usdAmount = fetchPriceConversion(
       currencyIds,
       currencyAmounts,
       parsedSecrets
     );
-
+    console.log("FetchPriceConversion done");
     return encodeReply([TYPE_RESPONSE, requestId, usdAmount]);
   } catch (error) {
     if (error === Error.FailedToFetchData) {

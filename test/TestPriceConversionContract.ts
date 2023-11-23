@@ -6,12 +6,13 @@ import { execSync } from "child_process";
 async function waitForResponse(consumer: Contract, event: Event) {
   const [, data] = event.args!;
   // Run Phat Function
-  const result = execSync(`phat-fn run --json dist/index.js -a ${data} https://api-mumbai.lens.dev/`).toString();
+  const result = execSync(
+    `phat-fn run --json dist/index.js -a ${data} https://api-mumbai.lens.dev/`
+  ).toString();
   const json = JSON.parse(result);
-  const action = ethers.utils.hexlify(ethers.utils.concat([
-    new Uint8Array([0]),
-    json.output,
-  ]));
+  const action = ethers.utils.hexlify(
+    ethers.utils.concat([new Uint8Array([0]), json.output])
+  );
   // Make a response
   const tx = await consumer.rollupU256CondEq(
     // cond
@@ -21,18 +22,20 @@ async function waitForResponse(consumer: Contract, event: Event) {
     [],
     [],
     // actions
-    [action],
+    [action]
   );
   const receipt = await tx.wait();
   return receipt.events;
 }
 
-describe("OracleConsumerContract.sol", function () {
+describe("PriceConversionContract.sol", function () {
   it("Push and receive message", async function () {
     // Deploy the contract
     const [deployer] = await ethers.getSigners();
-    const TestOracleConsumerContract = await ethers.getContractFactory("OracleConsumerContract");
-    const consumer = await TestOracleConsumerContract.deploy(deployer.address);
+    const TestPriceConversionContract = await ethers.getContractFactory(
+      "PriceConversionContract"
+    );
+    const consumer = await TestPriceConversionContract.deploy(deployer.address);
 
     // Make a request
     const profileId = "0x01";
@@ -42,7 +45,7 @@ describe("OracleConsumerContract.sol", function () {
     expect(reqEvents![0]).to.have.property("event", "MessageQueued");
 
     // Wait for Phat Contract response
-    const respEvents = await waitForResponse(consumer, reqEvents![0])
+    const respEvents = await waitForResponse(consumer, reqEvents![0]);
 
     // Check response data
     expect(respEvents[0]).to.have.property("event", "ResponseReceived");
