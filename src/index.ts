@@ -6,7 +6,7 @@
 import "@phala/pink-env";
 import { Coders } from "@phala/ethers";
 
-type HexString = `0x${string}`
+type HexString = `0x${string}`;
 
 // ETH ABI Coders available
 /*
@@ -58,6 +58,7 @@ const uintArrayCoder = new Coders.ArrayCoder(uintCoder, 10, "uint256");
 
 const uintCoder = new Coders.NumberCoder(32, false, "uint256");
 const bytesCoder = new Coders.BytesCoder("bytes");
+const uintArrayCoder = new Coders.ArrayCoder(uintCoder, 10, "uint256");
 
 function encodeReply(reply: [number, number, number]): HexString {
   return Coders.encode([uintCoder, uintCoder, uintCoder], reply) as HexString;
@@ -169,7 +170,6 @@ function parseReqStr(hexStr: string): string {
   return str;
 }
 
-
 //
 // Here is what you need to implemented for Phat Contract, you can customize your logic with
 // JavaScript here.
@@ -189,28 +189,36 @@ export default function main(request: HexString, secrets: string): HexString {
   console.log(`handle req: ${request}`);
   // Uncomment to debug the `secrets` passed in from the Phat Contract UI configuration.
   // console.log(`secrets: ${secrets}`);
-  let requestId, encodedReqStr;
+  let requestId, currencyIds, currencyAmounts;
   try {
-    [requestId, encodedReqStr] = Coders.decode([uintCoder, bytesCoder], request);
+    [requestId, currencyIds, currencyAmounts] = Coders.decode(
+      [uintCoder, uintArrayCoder, uintArrayCoder],
+      request
+    );
   } catch (error) {
     console.info("Malformed request received");
     return encodeReply([TYPE_ERROR, 0, errorToCode(error as Error)]);
   }
-  const parsedHexReqStr = parseReqStr(encodedReqStr as string);
-  console.log(`Request received for profile ${parsedHexReqStr}`);
+  return Coders.encode(
+    [uintCoder, uintArrayCoder, uintArrayCoder],
+    [requestId, currencyIds, currencyAmounts]
+  ) as HexString;
 
-  try {
-    const respData = fetchApiStats(secrets, parsedHexReqStr);
-    let stats = respData.data.profile.stats.totalPosts;
-    console.log("response:", [TYPE_RESPONSE, requestId, stats]);
-    return encodeReply([TYPE_RESPONSE, requestId, stats]);
-  } catch (error) {
-    if (error === Error.FailedToFetchData) {
-      throw error;
-    } else {
-      // otherwise tell client we cannot process it
-      console.log("error:", [TYPE_ERROR, requestId, error]);
-      return encodeReply([TYPE_ERROR, requestId, errorToCode(error as Error)]);
-    }
-  }
+  // const parsedHexReqStr = parseReqStr(encodedReqStr as string);
+  // console.log(`Request received for profile ${parsedHexReqStr}`);
+
+  // try {
+  //   const respData = fetchApiStats(secrets, parsedHexReqStr);
+  //   let stats = respData.data.profile.stats.totalPosts;
+  //   console.log("response:", [TYPE_RESPONSE, requestId, stats]);
+  //   return encodeReply([TYPE_RESPONSE, requestId, stats]);
+  // } catch (error) {
+  //   if (error === Error.FailedToFetchData) {
+  //     throw error;
+  //   } else {
+  //     // otherwise tell client we cannot process it
+  //     console.log("error:", [TYPE_ERROR, requestId, error]);
+  //     return encodeReply([TYPE_ERROR, requestId, errorToCode(error as Error)]);
+  //   }
+  // }
 }
